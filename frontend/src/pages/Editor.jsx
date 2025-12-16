@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Editor2 from "@monaco-editor/react";
 import Navbar from "../components/Navbar";
 import { api_base_url } from "../helper";
@@ -20,6 +20,7 @@ const languageMap = {
 };
 
 export default function Editor() {
+  const[isSaving,setIsSaving]=useState(false);
   const { id } = useParams();
 
   const [code, setCode] = useState("");
@@ -64,6 +65,45 @@ export default function Editor() {
       toast.error("Error loading project");
     }
   }
+
+ useEffect(() => {
+  const savedCode = localStorage.getItem(`autosave_${id}`);
+  if (savedCode) {
+    setCode(savedCode);
+  }
+ },[id]);
+
+
+ //auto save code
+ useEffect(() => {
+  if (!code) return;
+
+  setIsSaving(true);
+
+  const timer = setTimeout(async () => {
+    // 1️⃣ Save locally (instant safety)
+    localStorage.setItem(`autosave_${id}`, code);
+
+    // 2️⃣ Save to backend
+    try {
+      await fetch(api_base_url + "/saveProject", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: localStorage.getItem("token"),
+          code,
+          projectId: id,
+        }),
+      });
+    } catch {
+      // silent fail (no toast spam)
+    }
+
+    setIsSaving(false);
+  }, 1500); // ⏱️ debounce (1.5 sec)
+
+  return () => clearTimeout(timer);
+}, [code, id]);
 
   // Save code to backend
   async function saveCode() {

@@ -12,26 +12,22 @@ function getStartUpCode(language) {
   language = language.toLowerCase();
 
   if (language === "javascript") {
-    return `console.log('Hello, World!');`;
-
+    return `console.log('Hello, World!');`
   } else if (language === "python") {
-    return `print('Hello, World!')`;
-
+    return `print('Hello, World!')`
   } else if (language === "java") {
-    return `public class HelloWorld {
+    return `public class Main {
     public static void main(String[] args) {
         System.out.println("Hello, World!");
     }
-}`;
-
+}`
   } else if (language === "c") {
     return `#include <stdio.h>
 
 int main() {
     printf("Hello, World!\\n");
     return 0;
-}`;
-
+}`
   } else if (language === "c++") {
     return `#include <iostream>
 using namespace std;
@@ -39,24 +35,20 @@ using namespace std;
 int main() {
     cout << "Hello, World!" << endl;
     return 0;
-}`;
-
+}`
   } else if (language === "ruby") {
-    return `puts 'Hello, World!'`;
-
+    return `puts 'Hello, World!'`
   } else if (language === "go") {
     return `package main
 import "fmt"
 
 func main() {
     fmt.Println("Hello, World!")
-}`;
-
+}`
   } else if (language === "php") {
     return `<?php
 echo "Hello, World!";
-?>`;
-
+?>`
   } else if (language === "c#") {
     return `using System;
 
@@ -64,16 +56,13 @@ class HelloWorld {
     static void Main() {
         Console.WriteLine("Hello, World!");
     }
-}`;
-
+}`
   } else if (language === "typescript") {
-    return `console.log('Hello, World!');`;
-
+    return `console.log('Hello, World!');`
   } else {
-    return `language not supported`;
+    return `language not supported`
   }
 }
-
 
 //signuproute
 exports.signup = async (req, res) => {
@@ -376,14 +365,14 @@ exports.runCode = async (req, res) => {
 
     res.json({
       raw: result,
-      output: result.stdout || result.stderr || result.compile_output || result.message || "No output",
+      output:
+        result.stdout ||
+        result.stderr ||
+        result.compile_output ||
+        result.message ||
+        "No output",
     });
   } catch (err) {
     res.status(500).json({ error: err.toString() });
   }
 };
-
-
-
-
-

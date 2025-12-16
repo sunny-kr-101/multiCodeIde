@@ -6,18 +6,13 @@ import { toast } from "react-toastify";
 import { useEffect } from "react";
 
 
-const Login = () => {
+const Login = ({setIsAuthenticated}) => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-useEffect(() => {
-  const auth = localStorage.getItem("isAuthenticated");
-  setIsAuthenticated(auth === "true");
-}, []);
+  
 
 
   const [message, setMessage] = useState("");
@@ -41,7 +36,7 @@ useEffect(() => {
         localStorage.setItem("name", data.name);
         localStorage.setItem("isAuthenticated", "true");
         setIsAuthenticated(true);
-          navigate("/");
+          navigate("/home",{replace:true});
         toast.success("✅ login successful Enjoy Coding.");
       }
       else {
