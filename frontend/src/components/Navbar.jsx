@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import logo from "../images/mcl.png";
 import { useNavigate } from "react-router-dom";
 
+
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -12,8 +13,8 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("name");
-    localStorage.removeItem("isAuthenticated");
-    navigate("/login");
+    localStorage.removeItem("isAuthenticated", "false");
+    navigate("/" ,{replace:true});
   };
 
   const userName = localStorage.getItem("name") || "User";
