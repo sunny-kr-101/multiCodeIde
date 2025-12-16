@@ -1,7 +1,8 @@
 var express = require('express');
-const { signup ,login, createProject, saveProject,getProjects,getProject,deleteProject, editProject} = require('../controllers/userController');
+const { signup ,login, createProject, saveProject,getProjects,getProject,deleteProject, editProject, runCode} = require('../controllers/userController');
 const { create } = require('../models/projectModels');
 var router = express.Router();
+require("dotenv").config();
 
 
 /* GET home page. */
@@ -16,6 +17,7 @@ router.post('/getProjects',getProjects)
 router.post('/getProject',getProject)
 router.post('/deleteProject',deleteProject)
 router.post('/editProject',editProject)
+router.post("/runCode", runCode)
 
 
 

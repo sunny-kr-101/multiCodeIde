@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 
 const Home = () => {
   const navigate = useNavigate();
+  const userName = localStorage.getItem("name") || "Coder";
 
   // Modal States
   const [isCreateModelShow, setIsCreateModelShow] = useState(false);
@@ -40,16 +41,12 @@ const Home = () => {
     c: "https://img.icons8.com/?size=100&id=40670&format=png&color=000000",
     "c++": "https://img.icons8.com/?size=100&id=40669&format=png&color=000000",
     java: "https://img.icons8.com/?size=100&id=13679&format=png&color=000000",
-    php: "https://img.icons8.com/?size=100&id=cR0rO5Zn1j7R&format=png&color=000000",
-    typescript:
-      "https://img.icons8.com/?size=100&id=eEFQ0vZfvQ1a&format=png&color=000000",
+    php: "https://img.icons8.com/nolan/64/php--v2.png",
+    typescript: "https://img.icons8.com/color/48/typescript.png",
   };
 
   // CREATE PROJECT
   const createProject = async () => {
-    // if (!name.trim()) return toast.error("Project name is required!");
-    // if (!selectedLanguage) return toast.error("Please select a language!");
-
     let res = await fetch(api_base_url + "/createProject", {
       mode: "cors",
       method: "POST",
@@ -203,12 +200,12 @@ const Home = () => {
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-950 text-white">
       <Navbar />
 
       {/* Top Bar */}
       <div className="flex px-6 md:px-[100px] items-center justify-between mt-5">
-        <h3 className="text-lg md:text-xl">Hii 👋, Sunny</h3>
+        <h3 className="text-lg md:text-xl">Hii 👋, {userName ? userName : "user"}</h3>
 
         <motion.button
           whileHover={{ scale: 1.05 }}
@@ -220,64 +217,61 @@ const Home = () => {
         </motion.button>
       </div>
 
-      {/* Projects List */}
-      <div className="px-6 md:px-[100px] mt-5 space-y-5">
-        {projects && projects.length > 0
-          ? projects.map((project) => (
-              <div
-                key={project._id}
-                className="project w-full p-4 md:p-5 flex flex-col md:flex-row items-start md:items-center md:justify-between bg-[#0F0E0E] rounded-xl border border-white/10"
-              >
-                <div
-                  onClick={() => navigate("/editor/" + project._id)}
-                  className="flex items-center gap-4 w-full cursor-pointer"
-                >
-                  <img
-                    src={languageIcons[project.projectLanguage]}
-                    alt={project.projectLanguage}
-                    className="w-[55px]"
-                  />
-                  <div>
-                    <h3 className="text-lg md:text-xl">{project.name}</h3>
-                    <p className="text-sm text-gray-500">
-                      {formatDate(project.date)}
-                    </p>
-                  </div>
-                </div>
+    
+{/* Projects List */}
+<div className="px-6 md:px-[100px] mt-5 space-y-5">
+  {projects && projects.length > 0
+    ? projects.map((project) => (
+        <div
+          key={project._id}
+          onClick={() => navigate("/editor/" + project._id)}
+          className="project w-full p-4 md:p-5 flex flex-col md:flex-row items-start md:items-center md:justify-between bg-[#0F0E0E] rounded-xl border border-white/10 cursor-pointer hover:bg-[#1a1a1a] transition-colors duration-200"
+        >
+          <div className="flex items-center gap-4 w-full">
+            <img
+              src={languageIcons[project.projectLanguage]}
+              alt={project.projectLanguage}
+              className="w-[55px]"
+            />
+            <div>
+              <h3 className="text-lg md:text-xl">{project.name}</h3>
+              <p className="text-sm text-gray-500">{formatDate(project.date)}</p>
+            </div>
+          </div>
 
-                <div className="flex gap-3 mt-4 md:mt-0">
-                  {/* EDIT BUTTON */}
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.92 }}
-                    onClick={() => {
-                      setIsEditModelShow(true);
-                      setEditingProjectId(project._id);
-                      setName(project.name);
-                      setSelectedLanguage({
-                        label: project.projectLanguage,
-                        value: project.projectLanguage,
-                      });
-                    }}
-                    className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-800 transition"
-                  >
-                    Edit
-                  </motion.button>
+          <div className="flex gap-3 mt-4 md:mt-0">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsEditModelShow(true);
+                setEditingProjectId(project._id);
+                setName(project.name);
+                setSelectedLanguage({
+                  label: project.projectLanguage,
+                  value: project.projectLanguage,
+                });
+              }}
+              className="px-4 py-2 bg-blue-600 rounded-lg hover:bg-blue-800 transition"
+            >
+              Edit
+            </button>
 
-                  {/* DELETE BUTTON */}
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.92 }}
-                    onClick={() => deleteProject(project._id)}
-                    className="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-800 transition"
-                  >
-                    Delete
-                  </motion.button>
-                </div>
-              </div>
-            ))
-          : "No projects found. Create a new project to get started."}
-      </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteProject(project._id);
+              }}
+              className="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-800 transition"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      ))
+    : "No projects found. Create a new project to get started."}
+</div>
+
+
 
       {/* Create & Edit Modals */}
       <AnimatePresence>
@@ -326,7 +320,7 @@ const Home = () => {
           </ModalWrapper>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 };
 

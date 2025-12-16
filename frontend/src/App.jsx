@@ -1,6 +1,5 @@
 import React from "react";
-import "./App.css";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import NoPage from "./pages/NoPage";
 import SignUp from "./pages/SignUp";
@@ -9,24 +8,33 @@ import Editor from "./pages/Editor";
 
 const App = () => {
   return (
-    <>
-      <BrowserRouter>
-        <RouteHandler />
-      </BrowserRouter>
-    </>
-  );
-};
-const RouteHandler = () => {
-  return (
-    <>
+    <BrowserRouter>
       <Routes>
-        <Route path="/editor/:id" element={<Editor />} />
+        <Route
+          path="/"
+          element={
+            localStorage.getItem("isAuthenticated") === "true" ? (
+              <Home />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/editor/:id"
+          element={
+            localStorage.getItem("isAuthenticated") === "true" ? (
+              <Editor />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/" element={<Home />} />
         <Route path="*" element={<NoPage />} />
       </Routes>
-    </>
+    </BrowserRouter>
   );
 };
 

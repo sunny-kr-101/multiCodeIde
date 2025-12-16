@@ -5,49 +5,76 @@ var jwt = require("jsonwebtoken");
 const { get } = require("mongoose");
 const e = require("express");
 const JWT_SECRET = "secretkey";
+const axios = require("axios");
+require("dotenv").config();
 
 function getStartUpCode(language) {
-  if (language.toLowerCase() === "javascript") {
+  language = language.toLowerCase();
+
+  if (language === "javascript") {
     return `console.log('Hello, World!');`;
-  } else if (language.toLowerCase() === "python") {
+
+  } else if (language === "python") {
     return `print('Hello, World!')`;
-  } else if (language.toLowerCase() === "java") {
+
+  } else if (language === "java") {
     return `public class HelloWorld {
-      public static void main(String[] args) {
-          System.out.println("Hello, World!");
-      }
-  }`;
-  } else if (language.toLowerCase() === "c++") {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}`;
+
+  } else if (language === "c") {
+    return `#include <stdio.h>
+
+int main() {
+    printf("Hello, World!\\n");
+    return 0;
+}`;
+
+  } else if (language === "c++") {
     return `#include <iostream>
-    int main() {
-        std::cout << "Hello, World!" << std::endl;
-        return 0;
-    }`;
-  } else if (language.toLowerCase() === "ruby") {
+using namespace std;
+
+int main() {
+    cout << "Hello, World!" << endl;
+    return 0;
+}`;
+
+  } else if (language === "ruby") {
     return `puts 'Hello, World!'`;
-  } else if (language.toLowerCase() === "go") {
+
+  } else if (language === "go") {
     return `package main
-    import "fmt"
-    func main() {
-        fmt.Println("Hello, World!")
-    }`;
-  } else if (language.toLowerCase() === "php") {
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, World!")
+}`;
+
+  } else if (language === "php") {
     return `<?php
-    echo "Hello, World!";
-    ?>`;
-  } else if (language.toLowerCase() === "c#") {
+echo "Hello, World!";
+?>`;
+
+  } else if (language === "c#") {
     return `using System;
-    class HelloWorld {
-        static void Main() {
-            Console.WriteLine("Hello, World!");
-        }
-    }`;
-  } else if (language.toLowerCase() === "typescript") {
+
+class HelloWorld {
+    static void Main() {
+        Console.WriteLine("Hello, World!");
+    }
+}`;
+
+  } else if (language === "typescript") {
     return `console.log('Hello, World!');`;
+
   } else {
-    return `language not supported  `;
+    return `language not supported`;
   }
 }
+
+
 //signuproute
 exports.signup = async (req, res) => {
   try {
@@ -107,6 +134,7 @@ exports.login = async (req, res) => {
           success: true,
           msg: " user login successfully",
           token: token,
+          name: user.fullName,
         });
       } else {
         return res.status(404).json({
@@ -283,7 +311,10 @@ exports.editProject = async (req, res) => {
     }
 
     // Find project
-    let project = await projectModel.findOne({ _id: projectId, createdBy: user._id.toString()  });
+    let project = await projectModel.findOne({
+      _id: projectId,
+      createdBy: user._id.toString(),
+    });
     if (!project) {
       console.log("Project not found for the given user.");
       return res.status(404).json({
@@ -303,7 +334,6 @@ exports.editProject = async (req, res) => {
       message: "Project updated successfully",
       project,
     });
-
   } catch (error) {
     console.error("Error updating project:", error);
     return res.status(500).json({
@@ -312,4 +342,48 @@ exports.editProject = async (req, res) => {
     });
   }
 };
+
+//run code route
+
+// -----------------------------
+// ===============================
+//   RUN CODE CONTROLLER (FINAL)
+// ===============================
+// Run Code Route
+exports.runCode = async (req, res) => {
+  try {
+    const { code, language } = req.body;
+
+    const languageId = Number(language); // language_id from frontend
+
+    const response = await fetch(
+      "https://judge0-ce.p.rapidapi.com/submissions?wait=true",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-RapidAPI-Key": process.env.RAPIDAPI_KEY,
+          "X-RapidAPI-Host": process.env.RAPIDAPI_HOST,
+        },
+        body: JSON.stringify({
+          source_code: code,
+          language_id: languageId,
+        }),
+      }
+    );
+
+    const result = await response.json();
+
+    res.json({
+      raw: result,
+      output: result.stdout || result.stderr || result.compile_output || result.message || "No output",
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.toString() });
+  }
+};
+
+
+
+
 

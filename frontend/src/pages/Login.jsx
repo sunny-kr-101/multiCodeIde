@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { api_base_url } from "../helper";
 import { toast } from "react-toastify";
+import { useEffect } from "react";
+
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +12,13 @@ const Login = () => {
     password: "",
   });
   const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+useEffect(() => {
+  const auth = localStorage.getItem("isAuthenticated");
+  setIsAuthenticated(auth === "true");
+}, []);
+
 
   const [message, setMessage] = useState("");
 
@@ -29,6 +38,9 @@ const Login = () => {
       const data = await res.json();
       if (data.success) {
         localStorage.setItem("token", data.token);
+        localStorage.setItem("name", data.name);
+        localStorage.setItem("isAuthenticated", "true");
+        setIsAuthenticated(true);
           navigate("/");
         toast.success("✅ login successful Enjoy Coding.");
       }
